@@ -1,5 +1,7 @@
 package upei.project;
 
+import java.awt.*;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -7,7 +9,8 @@ import java.util.Random;
  */
 public abstract class Player {
     protected String name;
-    protected String color;
+    protected Color color;
+    protected List<Piece> pieces;
 
     /**
      * Constructs a Player with a name and color.
@@ -15,23 +18,32 @@ public abstract class Player {
      * @param name  Name of the player.
      * @param color Color of the player.
      */
-    public Player(String name, String color) {
+    public Player(String name, Color color, List<Piece> pieces) {
         this.name = name;
         this.color = color;
+        this.pieces = pieces;
     }
 
     /**
-     * Returns the player's next move.
-     *
-     * @return Move object representing the move.
+     * Determines the next move for the player.
+     * @param dieRoll The result of the die roll.
+     * @param allPlayers All players in the game for strategic decision-making.
      */
-    public abstract int getNextMove();
+    public abstract void makeMove(int dieRoll, List<Player> allPlayers);
+
+    public List<Piece> getPieces() { return pieces; }
 
     public String getName() {
         return name;
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
+
+    /**
+     * Returns true if the player is human.
+     */
+
+    public abstract boolean isHuman();
 }
