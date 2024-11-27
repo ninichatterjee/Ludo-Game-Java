@@ -2,27 +2,28 @@ package upei.project;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
 public class LudoGame extends JFrame {
-    private JPanel boardPanel;
-    private JLabel statusLabel;
-    private JButton rollButton;
-    public int dieRoll;
-    public int currentPlayerIndex = 0; // Player turn tracker
-    final List<Player> players = new ArrayList<>();
-    final Random random = new Random();
-    public boolean isGameOver = false;
+    private final BoardPanel boardPanel;
+    private final JLabel statusLabel;
+    private final JButton rollButton;
+    private int dieRoll;
+    private int currentPlayerIndex = 0;
+    private final List<Player> players = new ArrayList<>();
+    private final Random random = new Random();
+    private boolean isGameOver = false;
 
     public LudoGame() {
         setTitle("Ludo Game");
-        setSize(600, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Create players with places
+        // Initialize board layout
+        BoardPanel.initializeNodes();
+
+        // Create players with pieces
         List<Piece> bluePieces = createPieces(Color.BLUE);
         List<Piece> greenPieces = createPieces(Color.GREEN);
         List<Piece> yellowPieces = createPieces(Color.YELLOW);
@@ -30,27 +31,46 @@ public class LudoGame extends JFrame {
 
         // Create players
         players.add(new HumanPlayer("Blue", Color.BLUE, bluePieces));  // Human
-        players.add(new AIPlayer("Green", Color.GREEN, greenPieces)); // AI
-        players.add(new AIPlayer("Yellow", Color.YELLOW, yellowPieces));  // Human
-        players.add(new AIPlayer("Red", Color.RED, redPieces)); // AI
+        players.add(new AIPlayer("Green", Color.GREEN, greenPieces));  // AI
+        players.add(new AIPlayer("Yellow", Color.YELLOW, yellowPieces));  // AI
+        players.add(new AIPlayer("Red", Color.RED, redPieces));  // AI
 
         // Initialize components
         boardPanel = new BoardPanel(players);
         statusLabel = new JLabel("Blue's turn! Roll the dice.");
         rollButton = new JButton("Roll Dice");
 
+        // Style components
+        statusLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        statusLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        
+        rollButton.setFont(new Font("Arial", Font.BOLD, 14));
+        rollButton.setPreferredSize(new Dimension(120, 40));
+        
+        // Create button panel
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(rollButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
         // Roll button action
         rollButton.addActionListener(e -> {
             if (!isGameOver) {
                 rollDice();
             } else {
-                JOptionPane.showMessageDialog(this, "Game Over!");
+                JOptionPane.showMessageDialog(this, "Game Over! " + 
+                    players.get(currentPlayerIndex).getName() + " wins!");
             }
         });
 
-        add(boardPanel, BorderLayout.CENTER);
+        // Add components
         add(statusLabel, BorderLayout.NORTH);
-        add(rollButton, BorderLayout.SOUTH);
+        add(boardPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        // Pack and center
+        pack();
+        setLocationRelativeTo(null);
     }
 
     private List<Piece> createPieces(Color color) {
@@ -61,47 +81,75 @@ public class LudoGame extends JFrame {
         return pieces;
     }
 
-    public void rollDice() {
-        dieRoll = random.nextInt(6) + 1; // Roll 1-6
+    private void rollDice() {
         Player currentPlayer = players.get(currentPlayerIndex);
+        dieRoll = random.nextInt(6) + 1;
         statusLabel.setText(currentPlayer.getName() + " rolled a " + dieRoll);
+        
+        // Disable roll button during move
+        rollButton.setEnabled(false);
+        
+        // Use SwingWorker to handle AI moves without freezing UI
+        if (!currentPlayer.isHuman()) {
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    try {
+                        Thread.sleep(1000); // Add slight delay for AI moves
+                    } catch (InterruptedException ignored) {}
+                    currentPlayer.makeMove(dieRoll, players);
+                    return null;
+                }
 
-        // Make move based on player type
-        currentPlayer.makeMove(dieRoll, players);
-
-        // Update board and check if the game is over
-        boardPanel.repaint();
-        if (isGameOver()) {
-            statusLabel.setText(currentPlayer.getName() + " wins!");
-            isGameOver = true;
+                @Override
+                protected void done() {
+                    handlePostMove();
+                }
+            }.execute();
         } else {
+            currentPlayer.makeMove(dieRoll, players);
+            handlePostMove();
+        }
+    }
+
+    private void handlePostMove() {
+        // Update board
+        boardPanel.repaint();
+        
+        // Check if game is over
+        if (checkWinner(players.get(currentPlayerIndex))) {
+            isGameOver = true;
+            statusLabel.setText(players.get(currentPlayerIndex).getName() + " wins!");
+            rollButton.setText("New Game");
+        } else {
+            // Move to next player
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-            statusLabel.setText(players.get(currentPlayerIndex).getName() + "'s turn! Roll the dice.");
+            Player nextPlayer = players.get(currentPlayerIndex);
+            statusLabel.setText(nextPlayer.getName() + "'s turn! Roll the dice.");
         }
+        
+        // Re-enable roll button
+        rollButton.setEnabled(true);
     }
 
-    // Check if the game is over (any player has won)
-    public boolean isGameOver() {
-        for (Player player : players) {
-            if (checkWinner(player)) {
-                return true; // A winner is found
-            }
-        }
-        return false;
-    }
-
-    // Check if a player has won the game (i.e., moved all pieces to the finish)
     private boolean checkWinner(Player player) {
-        // Implement this logic based on your game rules (e.g., checking if all pieces are home)
+        // A player wins when all their pieces reach the finish (position 52)
         for (Piece piece : player.getPieces()) {
-            if (!piece.isAtHome()) {
-                return false; // If any piece is not home, the player hasn't won
+            if (piece.getPosition() < Player.BOARD_SIZE - 1) {
+                return false;
             }
         }
-        return true; // All pieces are home, player has won
+        return true;
     }
 
     public static void main(String[] args) {
+        try {
+            // Set system look and feel
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         SwingUtilities.invokeLater(() -> {
             LudoGame game = new LudoGame();
             game.setVisible(true);

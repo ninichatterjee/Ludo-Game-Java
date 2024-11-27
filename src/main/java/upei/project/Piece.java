@@ -3,58 +3,87 @@ package upei.project;
 import java.awt.*;
 
 public class Piece {
-    private int position; // -1 indicates the piece is still in the base
-    private final Color color; // Color of the piece
+    private Node currentNode;        // Current node (null means in base)
+    private final Color color;       // Color of the piece
+    private boolean isHome;          // Whether piece has reached home
 
     public Piece(Color color) {
-        this.position = -1; // Start in base
         this.color = color;
+        this.currentNode = null;
+        this.isHome = false;
     }
 
     /**
      * Moves the piece by specified number of steps
-     *
-     * @param steps The number of steps to move
+     * @return true if move was successful
      */
-    public void move(int steps) {
-        if (position == -1 && steps == 6) {
-            position = 0; // Move out of base if a 6 is rolled
-        } else if (position != -1) {
-            position += steps; // Normal move
+    public boolean move(int steps) {
+        // Handle moving out of base
+        if (currentNode == null) {
+            if (steps == 6) {
+                currentNode = getStartNode();
+                return true;
+            }
+            return false;
         }
+
+        // Follow the path for the given number of steps
+        Node targetNode = currentNode;
+        for (int i = 0; i < steps; i++) {
+            if (targetNode == null) return false;
+            targetNode = targetNode.getNext(color);
+        }
+
+        if (targetNode == null) return false;
+
+        currentNode = targetNode;
+        return true;
     }
 
     /**
-     * Returns whether the piece is still at home
-     *
-     * @return true if the piece is in the base, false otherwise
+     * Gets the starting node for this piece's color
      */
+    private Node getStartNode() {
+        // These positions correspond to the start positions for each color
+        int position = 0; // Default for blue
+        if (color == Color.GREEN) position = 13;
+        else if (color == Color.YELLOW) position = 26;
+        else if (color == Color.RED) position = 39;
+
+        return BoardPanel.getNodeAtPosition(position);
+    }
+
     public boolean isAtHome() {
-        return position == -1;
+        return currentNode == null;
     }
 
-    /**
-     * Gets the current position of the piece
-     *
-     * @return The position of the piece
-     */
-    public int getPosition() {
-        return position;
+    public boolean hasReachedHome() {
+        return isHome;
     }
 
-    /**
-     * Gets the color of the piece
-     *
-     * @return The color of the piece
-     */
+    public Node getCurrentNode() {
+        return currentNode;
+    }
+
     public Color getColor() {
         return color;
     }
 
-    /**
-     * Resets the piece back to the base
-     */
     public void sendToBase() {
-        position = -1;
+        currentNode = null;
+        isHome = false;
     }
+
+    /**
+     * Gets the current position for GUI display
+     */
+    public Point getDisplayPosition() {
+        if (currentNode == null) return null;
+        return new Point(currentNode.getX(), currentNode.getY());
+    }
+
+    public int getPosition() {
+        return currentNode == null ? -1 : currentNode.getPosition();
+    }
+
 }
