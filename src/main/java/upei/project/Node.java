@@ -12,6 +12,7 @@ public class Node {
     private Node next;              // Next node in the path
     private Node homePathNext;      // Next node in home path (if applicable)
     private final boolean isSafe;    // Whether this is a safe spot
+    private Piece currentPiece;     // The piece currently on this node
 
     /**
      * Creates a new node with given position and coordinates
@@ -21,6 +22,7 @@ public class Node {
         this.x = x;
         this.y = y;
         this.isSafe = isSafe;
+        this.currentPiece = null;
     }
 
     /**
@@ -44,6 +46,20 @@ public class Node {
         if (pieceColor == Color.YELLOW && position == 24) return true;
         if (pieceColor == Color.RED && position == 37) return true;
         return false;
+    }
+
+    /**
+     * Gets the piece currently on this node
+     */
+    public Piece getPiece() {
+        return currentPiece;
+    }
+
+    /**
+     * Sets the piece on this node
+     */
+    public void setPiece(Piece piece) {
+        this.currentPiece = piece;
     }
 
     // Getters and setters

@@ -1,86 +1,100 @@
 package upei.project;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-import javax.swing.JOptionPane;
 
 /**
- * HumanPlayer class allowing human interaction for moves.
+ * HumanPlayer class handles user interaction for making moves in the Ludo game.
  */
 public class HumanPlayer extends Player {
+    private final JFrame gameFrame;
+    private MoveValidator moveValidator;
 
-    public HumanPlayer(String name, Color color, List<Piece> pieces) {
+    public HumanPlayer(String name, Color color, List<Piece> pieces, JFrame gameFrame) {
         super(name, color, pieces);
+        this.gameFrame = gameFrame;
+        
+        // Set custom move validator for human player
+        setMoveValidator((piece, steps) -> {
+            String reason = getInvalidMoveReason(piece, steps);
+            if (reason != null) {
+                throw new InvalidMoveException(reason);
+            }
+        });
+    }
+
+    public void setMoveValidator(MoveValidator moveValidator) {
+        this.moveValidator = moveValidator;
     }
 
     @Override
     public void makeMove(int dieRoll, List<Player> allPlayers) {
-        // First check if any valid moves are available
         if (!hasValidMoves(dieRoll)) {
-            JOptionPane.showMessageDialog(null,
-                    "No valid moves available with roll of " + dieRoll);
+            JOptionPane.showMessageDialog(gameFrame, 
+                name + " has no valid moves with roll of " + dieRoll,
+                "No Valid Moves",
+                JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
-        Piece chosenPiece = null;
-        while (chosenPiece == null) {
-            // Build status message
-            StringBuilder message = new StringBuilder();
-            message.append("Die roll: ").append(dieRoll).append("\n\n");
-            message.append("Current piece positions:\n");
-            for (int i = 0; i < pieces.size(); i++) {
-                Piece piece = pieces.get(i);
-                message.append("Piece ").append(i + 1).append(": ");
-                if (piece.isAtHome()) {
-                    message.append("At Home");
-                } else {
-                    message.append("Position ").append(piece.getPosition());
-                }
-                if (!isValidMove(piece, dieRoll)) {
-                    message.append(" (Cannot move)");
-                }
-                message.append("\n");
-            }
-            message.append("\nEnter piece number (1-").append(pieces.size()).append("):");
-
-            String input = JOptionPane.showInputDialog(null, message.toString());
-
-            if (input == null) {  // User clicked Cancel
-                continue;
+        while (true) {
+            Piece selectedPiece = selectPiece(dieRoll);
+            if (selectedPiece == null) {
+                // User cancelled move
+                return;
             }
 
             try {
-                int pieceIndex = Integer.parseInt(input) - 1;
-                if (pieceIndex >= 0 && pieceIndex < pieces.size()) {
-                    Piece selectedPiece = pieces.get(pieceIndex);
-                    if (isValidMove(selectedPiece, dieRoll)) {
-                        chosenPiece = selectedPiece;
-                    } else {
-                        String reason;
-                        if (selectedPiece.isAtHome() && dieRoll != 6) {
-                            reason = "You need a 6 to move a piece out of home.";
-                        } else {
-                            reason = "This move would exceed the board limits.";
-                        }
-                        JOptionPane.showMessageDialog(null,
-                                "Invalid move! " + reason);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null,
-                            "Invalid piece number. Please enter a number between 1 and " + pieces.size());
-                }
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null,
-                        "Invalid input. Please enter a number!");
+                moveValidator.validate(selectedPiece, dieRoll);
+                selectedPiece.move(dieRoll);
+                handleCapture(selectedPiece.getCurrentNode(), allPlayers);
+                break;
+            } catch (InvalidMoveException e) {
+                JOptionPane.showMessageDialog(gameFrame,
+                    "Invalid move: " + e.getMessage(),
+                    "Invalid Move",
+                    JOptionPane.WARNING_MESSAGE);
             }
         }
+    }
 
-        // Make the move
-        int targetPosition = chosenPiece.isAtHome() ? 0 : chosenPiece.getPosition() + dieRoll;
-        chosenPiece.move(dieRoll);
+    /**
+     * Validates a move for human player with user feedback
+     */
+    private boolean validateHumanMove(Piece piece, int steps) {
+        String reason = getInvalidMoveReason(piece, steps);
+        if (reason != null) {
+            JOptionPane.showMessageDialog(gameFrame,
+                "Invalid move: " + reason,
+                "Invalid Move",
+                JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        return true;
+    }
 
-        // Handle captures
-        handleCapture(targetPosition, allPlayers);
+    /**
+     * Prompts the user to select a piece to move
+     */
+    private Piece selectPiece(int dieRoll) {
+        Object[] options = pieces.stream()
+            .filter(piece -> isValidMove(piece, dieRoll))
+            .toArray();
+
+        if (options.length == 0) {
+            return null;
+        }
+
+        return (Piece) JOptionPane.showInputDialog(
+            gameFrame,
+            "Select a piece to move " + dieRoll + " steps",
+            name + "'s Turn",
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[0]
+        );
     }
 
     @Override

@@ -2,112 +2,141 @@ package upei.project;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import upei.project.MoveValidator; // Add MoveValidator import
 
 /**
  * Abstract Player class representing a generic player in the game.
  */
 public abstract class Player {
-    protected static final int BOARD_SIZE = 52;  // Standard Ludo board size
-    protected static final int[] SAFE_SPOTS = {0, 8, 13, 21, 26, 34, 39, 47};  // Safe spots on board
-
     protected String name;
     protected Color color;
     protected List<Piece> pieces;
+    protected MoveValidator moveValidator; // Change access modifier to protected
+    protected BiFunction<Piece, Integer, Integer> moveStrategy;
+    private List<Player> allPlayers;
 
     /**
      * Constructs a Player with a name and color.
-     *
-     * @param name  Name of the player.
-     * @param color Color of the player.
-     * @param pieces List of player's pieces
      */
     public Player(String name, Color color, List<Piece> pieces) {
         this.name = name;
         this.color = color;
         this.pieces = pieces;
+        this.moveValidator = (piece, steps) -> piece.validateMove(steps);
+        this.moveStrategy = (piece, dieRoll) -> evaluateMove(piece, dieRoll); // Default strategy
+    }
+
+    /**
+     * Default move evaluation strategy
+     */
+    protected int evaluateMove(Piece piece, int dieRoll) {
+        if (piece.isAtHome() && dieRoll == 6) return 100;  // Prioritize getting pieces out
+        if (piece.hasReachedHome()) return -1;  // Don't move pieces that reached home
+        return piece.getDistanceFromHome();  // Prefer pieces closer to home
+    }
+
+    /**
+     * Sets the move validation strategy
+     */
+    protected void setMoveValidator(MoveValidator validator) {
+        this.moveValidator = validator;
+    }
+
+    /**
+     * Sets the list of all players in the game
+     */
+    public void setAllPlayers(List<Player> players) {
+        this.allPlayers = players;
+    }
+
+    /**
+     * Gets the list of all players
+     */
+    protected List<Player> getAllPlayers() {
+        return allPlayers;
     }
 
     /**
      * Determines the next move for the player.
-     * @param dieRoll The result of the die roll.
-     * @param allPlayers All players in the game for strategic decision-making.
      */
     public abstract void makeMove(int dieRoll, List<Player> allPlayers);
 
     /**
      * Checks if a move is valid for a given piece and die roll.
-     * @param piece The piece to move
-     * @param dieRoll The die roll value
-     * @return true if the move is valid, false otherwise
      */
     protected boolean isValidMove(Piece piece, int dieRoll) {
-        // Can't move if piece is at home and didn't roll 6
-        if (piece.isAtHome() && dieRoll != 6) {
-            return false;
-        }
-
-        // If piece is at base and rolled 6, it's a valid move
-        if (piece.isAtHome() && dieRoll == 6) {
+        try {
+            moveValidator.validate(piece, dieRoll);
             return true;
-        }
-
-        // Check if piece has already reached home
-        if (piece.hasReachedHome()) {
+        } catch (InvalidMoveException e) {
             return false;
         }
+    }
 
-        // Simulate the move to check if it's valid
-        Node currentNode = piece.getCurrentNode();
-        for (int i = 0; i < dieRoll; i++) {
-            if (currentNode == null) {
-                return false;
-            }
-            currentNode = currentNode.getNextForColor(color);
+    /**
+     * Gets the reason why a move is invalid
+     */
+    protected String getInvalidMoveReason(Piece piece, int dieRoll) {
+        try {
+            moveValidator.validate(piece, dieRoll);
+            return null;
+        } catch (InvalidMoveException e) {
+            return e.getMessage();
         }
+    }
 
-        return currentNode != null;
+    /**
+     * Finds the best piece to move based on the current strategy
+     */
+    protected Optional<Piece> findBestPiece(int dieRoll, List<Player> allPlayers) {
+        setAllPlayers(allPlayers);
+        return pieces.stream()
+            .filter(piece -> isValidMove(piece, dieRoll))
+            .max((p1, p2) -> Integer.compare(
+                evaluateMove(p1, dieRoll),
+                evaluateMove(p2, dieRoll)
+            ));
     }
 
     /**
      * Handles piece capture at a specific node
-     * @param node The node to check for captures
-     * @param allPlayers List of all players
      */
-    protected void handleCapture(Node node, List<Player> allPlayers) {
-        if (node == null || node.isSafeSpot()) return;
+    protected void handleCapture(Node targetNode, List<Player> allPlayers) {
+        if (targetNode == null || targetNode.isSafe()) return;
 
-        for (Player otherPlayer : allPlayers) {
-            if (otherPlayer == this) continue;
-
-            for (Piece otherPiece : otherPlayer.getPieces()) {
-                if (!otherPiece.isAtHome() && !otherPiece.hasReachedHome() &&
-                        otherPiece.getCurrentNode() == node) {
-                    otherPiece.sendToBase();
-                }
-            }
-        }
+        allPlayers.stream()
+            .filter(player -> player != this)
+            .forEach(player -> player.getPieces().stream()
+                .filter(piece -> !piece.isAtHome() && !piece.hasReachedHome() && 
+                               piece.getCurrentNode() == targetNode)
+                .forEach(Piece::sendToBase));
     }
 
     /**
-     * Gets the player's name
+     * Checks if any valid moves are available
      */
+    public boolean hasValidMoves(int dieRoll) {
+        return pieces.stream().anyMatch(piece -> isValidMove(piece, dieRoll));
+    }
+
     public String getName() {
         return name;
     }
 
-    /**
-     * Gets the player's color
-     */
     public Color getColor() {
         return color;
     }
 
-    /**
-     * Gets the player's pieces
-     */
     public List<Piece> getPieces() {
         return pieces;
     }
+
+    /**
+     * Returns true if the player is human.
+     */
+    public abstract boolean isHuman();
 
     /**
      * Checks if the player has won
@@ -115,9 +144,4 @@ public abstract class Player {
     public boolean hasWon() {
         return pieces.stream().allMatch(Piece::hasReachedHome);
     }
-
-    /**
-     * Returns true if the player is human.
-     */
-    public abstract boolean isHuman();
 }
