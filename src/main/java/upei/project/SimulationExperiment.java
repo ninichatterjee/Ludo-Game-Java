@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SimulationExperiment {
+    /*
     public static void main(String[] args) {
         System.out.println("Running Ludo Simulation...");
 
         int trials = 60;
         List<Player> players = new ArrayList<>();
-        players.add(new HumanPlayer("Alice", Color.BLUE, createPieces(Color.BLUE)));
+        players.add(new AIPlayer("Player1", Color.BLUE, createPieces(Color.BLUE)));
         players.add(new AIPlayer("Bot1", Color.RED, createPieces(Color.RED)));
         players.add(new AIPlayer("Bot2", Color.GREEN, createPieces(Color.GREEN)));
         players.add(new AIPlayer("Bot3", Color.YELLOW, createPieces(Color.YELLOW)));
@@ -38,4 +39,5 @@ public class SimulationExperiment {
         }
         return pieces;
     }
+     */
 }
