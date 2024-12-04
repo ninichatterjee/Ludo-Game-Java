@@ -92,6 +92,7 @@ public class SimulationExperiment {
         for (int i = 0; i < 4; i++) {
             pieces.add(new Piece(color, boardPanel));
         }
+
         AIPlayer player = new AIPlayer(name, color, pieces);
         
         // Set strategy-specific move evaluation
