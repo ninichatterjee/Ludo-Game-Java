@@ -61,8 +61,8 @@ public class LudoGame extends JFrame {
     private void rollDice(ActionEvent evt) {
         try {
             if (isGameOver) {
-                JOptionPane.showMessageDialog(this, 
-                    "Game Over! " + players.get(currentPlayerIndex).getName() + " wins!");
+                JOptionPane.showMessageDialog(this,
+                        "Game Over! " + players.get(currentPlayerIndex).getName() + " wins!");
                 return;
             }
 
@@ -75,13 +75,13 @@ public class LudoGame extends JFrame {
 
             rollButton.setEnabled(false);
             makeMove();
-            
+
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error during dice roll", e);
-            JOptionPane.showMessageDialog(this, 
-                "An error occurred while rolling the dice: " + e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "An error occurred while rolling the dice: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
             rollButton.setEnabled(true);
         }
     }
@@ -117,10 +117,10 @@ public class LudoGame extends JFrame {
 
             if (currentPlayer.hasWon()) {
                 isGameOver = true;
-                JOptionPane.showMessageDialog(this, 
-                    currentPlayer.getName() + " has won the game!",
-                    "Game Over",
-                    JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        currentPlayer.getName() + " has won the game!",
+                        "Game Over",
+                        JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
 
@@ -131,17 +131,33 @@ public class LudoGame extends JFrame {
             if (!players.get(currentPlayerIndex).isHuman()) {
                 dieRoll = random.nextInt(6) + 1;
                 statusLabel.setText(players.get(currentPlayerIndex).getName() + " rolled a " + dieRoll);
-                makeMove();
+                
+                // Create and show an "OK" button dialog
+                JButton okButton = new JButton("OK");
+                JDialog dialog = new JDialog(this, "AI Move", true);
+                dialog.setLayout(new FlowLayout());
+                dialog.add(new JLabel(statusLabel.getText()));
+                dialog.add(okButton);
+                dialog.setSize(300, 100);
+                dialog.setLocationRelativeTo(this);
+                
+                okButton.addActionListener(e -> {
+                    dialog.dispose();
+                    makeMove();  // Continue with the next move after OK is clicked
+                });
+                
+                dialog.setVisible(true);  // This will block until OK is clicked
+                return;  // Return here to prevent immediate recursive call
             } else {
                 statusLabel.setText(players.get(currentPlayerIndex).getName() + "'s turn! Roll the dice.");
                 rollButton.setEnabled(true);
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error during player move", e);
-            JOptionPane.showMessageDialog(this, 
-                "An error occurred during the move: " + e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "An error occurred during the move: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
             rollButton.setEnabled(true);
         }
     }
@@ -153,7 +169,7 @@ public class LudoGame extends JFrame {
             });
         } catch (Exception e) {
             Logger.getLogger(LudoGame.class.getName())
-                  .log(Level.SEVERE, "Failed to start game", e);
+                    .log(Level.SEVERE, "Failed to start game", e);
         }
     }
 }

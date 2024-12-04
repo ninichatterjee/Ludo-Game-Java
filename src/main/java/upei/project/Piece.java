@@ -132,6 +132,13 @@ public class Piece {
         isHome = false;
     }
 
+    /**
+     * Gets the color of this piece
+     */
+    public Color getColor() {
+        return color;
+    }
+
     public Node getCurrentNode() {
         return currentNode;
     }
