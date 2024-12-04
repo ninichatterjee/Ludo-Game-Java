@@ -89,7 +89,7 @@ public class BoardPanel extends JPanel {
 
         // Draw nodes
         for (Node node : nodes) {
-            g.setColor(node.isSafe() ? Color.YELLOW : Color.LIGHT_GRAY);
+            g.setColor(node.isSafe() ? Color.ORANGE : Color.LIGHT_GRAY);
             g.fillRect(node.getX(), node.getY(), TILE_SIZE, TILE_SIZE);
             g.setColor(Color.BLACK);
             g.drawRect(node.getX(), node.getY(), TILE_SIZE, TILE_SIZE);
