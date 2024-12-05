@@ -10,19 +10,52 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 
 /**
- * Main game class that manages the Ludo game state and UI
+ * Main game class that manages the Ludo game state and user interface.
+ * This class is responsible for:
+ * - Creating and managing the game window
+ * - Initializing players (both human and AI)
+ * - Managing game turns and dice rolls
+ * - Handling game state transitions
+ * - Providing user feedback through the UI
+ *
+ * The game supports one human player (Blue) and three AI players
+ * (Green, Yellow, and Red) with customizable strategies.
+ *
+ * @author UPEI Project Team
+ * @version 1.0
  */
 public class LudoGame extends JFrame {
+    /** Logger for game events and errors */
     private static final Logger LOGGER = Logger.getLogger(LudoGame.class.getName());
+    
+    /** List of all players in the game */
     private final List<Player> players;
+    
+    /** Panel displaying the game board */
     private final BoardPanel boardPanel;
+    
+    /** Index of the current player's turn */
     private int currentPlayerIndex = 0;
+    
+    /** Current dice roll value */
     private int dieRoll;
+    
+    /** Button for rolling the dice */
     private final JButton rollButton;
+    
+    /** Label displaying game status messages */
     private final JLabel statusLabel;
+    
+    /** Flag indicating if the game has ended */
     private boolean isGameOver = false;
+    
+    /** Random number generator for dice rolls */
     private final Random random = new Random();
 
+    /**
+     * Creates and initializes a new Ludo game.
+     * Sets up the game window, board, players, and UI components.
+     */
     public LudoGame() {
         setTitle("Ludo Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -53,11 +86,37 @@ public class LudoGame extends JFrame {
 
         setMinimumSize(new Dimension(800, 800));
         setResizable(true);
-
         pack();
         setLocationRelativeTo(null);
     }
 
+    /**
+     * Initializes all players in the game.
+     * Creates one human player (Blue) and three AI players with different colors.
+     * Sets up player relationships and board references.
+     */
+    private void initializePlayers() {
+        // Create human player (Blue)
+        players.add(new HumanPlayer("Blue", Color.BLUE, boardPanel, this));
+
+        // Create AI players
+        players.add(new AIPlayer("Green", Color.GREEN, boardPanel));
+        players.add(new AIPlayer("Yellow", Color.YELLOW, boardPanel));
+        players.add(new AIPlayer("Red", Color.RED, boardPanel));
+
+        // Set the list of all players for each player
+        for (Player player : players) {
+            player.setAllPlayers(players);
+        }
+    }
+
+    /**
+     * Handles the dice roll action.
+     * Generates a random roll, updates the UI, and triggers the current player's move.
+     * Also handles game over conditions and error cases.
+     *
+     * @param evt The action event from the roll button
+     */
     private void rollDice(ActionEvent evt) {
         try {
             if (isGameOver) {
@@ -86,29 +145,11 @@ public class LudoGame extends JFrame {
         }
     }
 
-    private void initializePlayers() {
-        // Create human player (Blue)
-        players.add(new HumanPlayer("Blue", Color.BLUE, createPieces(Color.BLUE), this));
-
-        // Create AI players
-        players.add(new AIPlayer("Green", Color.GREEN, createPieces(Color.GREEN)));
-        players.add(new AIPlayer("Yellow", Color.YELLOW, createPieces(Color.YELLOW)));
-        players.add(new AIPlayer("Red", Color.RED, createPieces(Color.RED)));
-
-        // Set the list of all players for each player
-        for (Player player : players) {
-            player.setAllPlayers(players);
-        }
-    }
-
-    private List<Piece> createPieces(Color color) {
-        List<Piece> pieces = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            pieces.add(new Piece(color, boardPanel));
-        }
-        return pieces;
-    }
-
+    /**
+     * Triggers the current player's move based on the dice roll.
+     * Updates the game state, board, and UI accordingly.
+     * Handles game over conditions and error cases.
+     */
     public void makeMove() {
         Player currentPlayer = players.get(currentPlayerIndex);
         try {
@@ -152,6 +193,7 @@ public class LudoGame extends JFrame {
                 statusLabel.setText(players.get(currentPlayerIndex).getName() + "'s turn! Roll the dice.");
                 rollButton.setEnabled(true);
             }
+
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error during player move", e);
             JOptionPane.showMessageDialog(this,
@@ -162,14 +204,15 @@ public class LudoGame extends JFrame {
         }
     }
 
+    /**
+     * Main entry point for the Ludo game application.
+     * Creates and displays the game window.
+     *
+     * @param args Command-line arguments (not used)
+     */
     public static void main(String[] args) {
-        try {
-            SwingUtilities.invokeLater(() -> {
-                new LudoGame().setVisible(true);
-            });
-        } catch (Exception e) {
-            Logger.getLogger(LudoGame.class.getName())
-                    .log(Level.SEVERE, "Failed to start game", e);
-        }
+        SwingUtilities.invokeLater(() -> {
+            new LudoGame().setVisible(true);
+        });
     }
 }
