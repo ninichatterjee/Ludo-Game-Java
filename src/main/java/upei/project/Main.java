@@ -3,24 +3,37 @@ package upei.project;
 import javax.swing.*;
 
 /**
- * Main class to run the Ludo game
+ * Main entry point for the Ludo game application.
+ * This class initializes and launches the graphical user interface for the Ludo game.
+ * It sets up the system look and feel and displays initial game instructions to the player.
+ *
+ * @author UPEI Project Team
+ * @version 1.0
  */
 public class Main {
+    /**
+     * The main method that starts the Ludo game application.
+     * Creates the game window and displays it on the Event Dispatch Thread to ensure
+     * thread safety in Swing operations. Shows a welcome message with game instructions
+     * to help new players understand the rules.
+     *
+     * @param args Command line arguments (not used in this application)
+     */
     public static void main(String[] args) {
-        // Ensure the GUI is created on the Event Dispatch Thread
+        // Ensure the GUI is created on the Event Dispatch Thread for thread safety
         SwingUtilities.invokeLater(() -> {
             try {
-                // Set system look and feel
+                // Set system look and feel for native platform appearance
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            // Create and show the game
+            // Initialize the main game window
             LudoGame game = new LudoGame();
             game.setVisible(true);
 
-            // Display welcome message with game instructions
+            // Display comprehensive welcome message with game rules and instructions
             JOptionPane.showMessageDialog(game,
                 "Welcome to Ludo!\n\n" +
                 "Game Rules:\n" +
