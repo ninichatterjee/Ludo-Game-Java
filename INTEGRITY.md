@@ -7,11 +7,11 @@ As a student in 2024F CS2910 at the University of Prince Edward Island, I am com
 - To treat my personal learning as valuable it its own right.
 - To contribute in meaningful and substantive ways to all aspects of the project. 
 
-We/I submit this assessment, acknowledging the above commitments and that I have followed the rules
+We submit this assessment, acknowledging the above commitments and that I have followed the rules
 outlined by my instructor and consistent with the Academic Regulation 20.
 
 Signatures:
 
-Student name (Student number)
+Ditthi Chatterjee (368797)
 
-Student name (Student number)
+Mohammed Sahm (372021)
