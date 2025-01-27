@@ -1,209 +1,194 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/lSSXQhBk)
-# 2024F CS2910 Programming Project Specification
+# 2024F CS2910 Project Report
+**Group Members**
+1. Ditthi Chatterjee 
+2. Mohammed Sahm 
 
-**Release Date: October 31, 2024 17:00**
+# Summary of Game
+Ludo is a strategy-based board game for 2–4 players. Each player has four tokens and aims to move all of them from the 
+starting area to the "home" space by rolling a die. The board is divided into four colored sections (red, blue, green, yellow), 
+each corresponding to a player. Tokens move clockwise around the board. Players can send opponents’ tokens back to their start 
+by landing on the same square. The first player to get all tokens "home" wins.
+For detailed rules of traditional Ludo, visit https://en.wikipedia.org/wiki/Ludo_(board_game)#Rules
 
-**Due Date:  December 5, 2024 23:59**
+For project-specific instructions, refer to the details & instructions provided under "Human-Interactive Implementation & Game Instructions".
 
-# Assignment Description:
-You will be developing a simulation for a popular board game of your choice, following 
-the principles of Test-Driven Development (TDD), applying object-oriented design (OOD) 
-principles, and reflecting on the use of generative AI tools. The assignment is divided 
-into four phases with a recommended amount of time to spend on each phase.  For 
-implementation phases, you will emphasize object-oriented design, write failing tests, 
-implement code to pass the tests, and refactoring as needed.  You will use your code
-to conduct a small experiment.  Additionally, you will have the opportunity to reflect 
-on your use of generative AI tools in the project.
+# Human-Interactive Implementation & Game Instructions
+As an addition to this project, we implemented a human-interactive ludo game. The ludo game in this project is very similar to the traditional game, with very few differences. 
+Some key differences in the game include:
+1. **Total number of tiles each piece needs to reach home:** 
+In a traditional Ludo game this number is 57, while in our project the total number of tiles needed is only 52.
+2. **The graphic representation of the board:**
+The board used in the GUI of the game closely resembles the structure of the Nodes we used to represent each tile. Each tile in the GUI is a node positioned from 0 to 51.
 
-# Objectives
-- Develop a well-documented board game simulation using Test-Driven Development (TDD) and 
-object-oriented design (OOD) principles.
-- Create multiple player strategies, each designed by your team to address specific game scenarios.
-- Integrate player strategies into the game simulation.
-- Generate a report with data and analyses comparing player strategies' performance.
-- Create a reflective assessment of the use of generative AI tools during the project.
+**For reference, here is the comparison between how a traditional board (left) looks like versus how our GUI board (right) looks like:**
+![img_2.png](img_2.png)
 
-# Project Phases
+**How to run the Game?**
+It's simple!, once you have downloaded/cloned the repository, run the Main.java Class and you're good to go!
 
-## Phase 1: Board Game Implementation (2 week)
+**Project-specific details in the game:**
+1. The human-interactive version of the game only allows for one human player in the game.
+2. The human player competes against 3 AI players during the game.
+3. The movement of the tiles are slightly different from the traditional board game, thanks to the differences in the graphical representations. Each piece moves across each tile, once it reaches the end of a line, it moves onto the last crossed safe spot on the board and continues its way along the following line.
+4. Gameplay instructions are first provided in the output window when the user runs the game program.
 
-In this phase you will implement the class structure for a board game.  It should be sufficient that you can
-use these classes in conjunction with player related classes to play a complete game.
+**Visual Demonstration of the movement of each tile on the board**
+![img_4.png](img_4.png)
 
-**Tasks:**
-- Select a popular board game. This board game choice should have sufficient structure that you have at least 1 collection 
-(aggregation relationship) and one generalization (inheritance relationship) hierarchy, adhering to object-oriented 
-design principles. 
-- Write failing tests to ensure the core game mechanics are correctly implemented.
-- Implement the board game classes for those tests.
-- Refactor the code to enhance clarity and maintainability.
+**How to Play the Game?**
+1. Roll the dice when it is your turn.
+2. Pick one available piece you want to move after each die roll.
+3. The game ends when one of the players has all their pieces reach home!
 
-## Phase 2: Player Classes and Strategies (1 week)
+# Experiment Report
+## Player Strategies
 
-Using the class structure from **Phase 1** create a set of player classes and choose 3 strategies and implement the players
-making choices.  Strategies can be as complex or as simple as you like.
+1. Attack Strategy: The aggressive strategy heavily prioritizes capturing opponent pieces, assigning +200 points for potential captures. It aggressively seeks to get pieces out of base (+100 points when rolling a 6) and focuses on forward movement. This strategy takes more risks and values offensive play over safety, making it potentially powerful but vulnerable to counterattacks.
 
-**Tasks:**
--	Develop at least three distinct player strategies for your game.
--	Apply object-oriented design principles to design cohesive player and related classes.
--	Write failing tests for each player strategy to ensure they make valid and effective moves.
--	Implement the player strategy code.
-- Integrate the player strategies into the game simulation while maintaining object-oriented design principles.
+2. Defense Strategy: The defensive strategy emphasizes safety and protection, giving the highest priority (+200 points) to reaching safe spots. It's more cautious about leaving the base (+50 points for a 6) and assigns lower value to captures (+50 points) compared to the aggressive strategy. The focus is on protecting pieces and making steady, safe progress toward home.
 
-## Phase 3: Simulation and Comparison (1 week)
+3. Balanced Strategy: The balanced strategy combines elements of both aggressive and defensive play. It assigns moderate values to all actions: +150 points for leaving base with a 6, +100 points for captures, and +50 points for reaching safe spots. This creates a well-rounded approach that adapts to game situations, balancing opportunities for capture with the need for safety.
 
-Using the class structures from **Phase 1** and **Phase 2**, to write a simulation and complete an experiment comparing your chosen strategies.
+## Procedure of Simulation
+The simulation experiment is designed to evaluate different AI strategies in the Ludo game. Here's how it works:
 
-**Tasks:**
-- Identify data that will provide you with insight into what is the best strategy.  All
-simulations should report win rate, but you should add data that is appropriate for your game such as: currency collection, 
-resource acquisition, average moves etc. to provide insight into what is happening in your simulation.
-- Write a simulation class called SimulationExperiment which runs a simulation experiment where it plays
-a series of games.  This class should have a main method that will run the complete simulation experiment
-that is appropriate for your game and chosen player strategies: 
-  - If you have a 2-player game, you should pair each of the 3 strategies against each other.  You should run a minimum of 20 trials for 
-  each pairing of these strategies.  More data may reveal more about how your strategies behave in different situations.
-  - If you have a 3 or more-player game, you should run a minimum of 60 trials with all strategies in play.  You may 
-  conduct more trials with more than 3 players combining different strategies which may reveal more about how your 
-  strategies behave in different combinations.
-  - Report human-readable, well-formatted, experimental data for use in analysis. 
-- Collect and analyze data on strategy performance based on win rates and additional data you have identified.
-- Document your findings and comparisons of the player strategies. From the data you should identify which strategy 
-is best, justify that choice, and explain why one strategy does better than the others.
+**Setup & Configuration:**
 
-## Phase 4: Finalization, and Reporting (1 week) 
+Runs 20 trials per configuration (NUM_TRIALS constant)
+Maximum of 500 moves per game before declaring it stuck
+Tests three strategies: Aggressive, Defensive, and Balanced
+Runs both single-strategy games (all players using same strategy) and mixed-strategy combinations
 
-**Tasks:**
-- All reporting should be completed in the file located at the same level as the _src_ directory named **REPORT.md**. Please
-leave the headings in this file unchanged.  This file is in Git markdown, a very 
-simple formatting language which can can read more about here: 
-[Git Markdown Instructions](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-You can edit this file in IntelliJ alongside the rest of your code.  The file has **Examples** of most markdown you would need
-for this specific report. You may delete any _italicized_ text and any examples provided.
-- All classes should be documented as specified in the Documentation Requirements below.
-- All classes should testable as specified in Testing Requirements described below.
-- Prepare a report that contains the following (word counts are maximums): 
-  - A summary description of the game that you chose.  This should include the name of the game, the goal of the 
-  game and a brief description of the key objects in the game.  Please provide a link to the game and/or its rules online. (100 words)
-  - For each of 3 strategies you implemented, name the strategy, and then description of it (100 words each) 
-  - A description of your procedure for running the experiment on your code. This should include information 
-  regarding the setup of the experiment in terms of what it runs and how it compares the player strategies, 
-  the number of trials the experiment and what data was collected. (250 words)
-  - A presentation on the results of your simulation of the strategies in table(s) or appropriate graphic(s) with 
-  a short summary. (250 words)
-  - An interpretation of your data explaining why one strategy is better than the other supported with data 
-  from your experiment. (500 words)
-  - A reflection on your experiences with generative AI during this project.  Where did you use it, how did it help, 
-  where did it hinder your development (500 words)?  
+1. Strategy Implementation:
+    - Prioritizes moves as per points - capturing opponent pieces (+200 points), getting pieces out of base (+100 points), and advancing towards home.
+    - Each strategy implements a scoring system to evaluate potential moves
+    - AI players use these strategies to decide their moves based on the highest scoring move available 
 
-# Technical Requirements
+2. Game Execution:
+   - Each game has 4 players with different colored pieces (Red, Blue, Green, Yellow)
+   - Players take turns rolling dice and moving pieces
+   - Special rules to prevent stuck games:
+     - Multiple roll attempts in late game (after 200 moves)
+     - Guaranteed 6s in early game (first 100 moves)
+     - Help for stuck players after 10 consecutive failed moves
 
-## Code Requirements
-- All code should be in the Java programming language using Java 17 or higher using Java programming style conventions.
-- Your code should demonstrate good application of the principles of modularity, coupling, cohesion, and encapsulation within your object architecture.
-- Data types and data structures should be appropriately chosen.  You may use classes from the Java Collections Framework (JCF) if appropriate.  Most commonly this will be ArrayList, Queue, Stack and PriorityQueue. 
-- You should have a  SimulationExperiment class which contains a runnable main program that reproduces your experiment.
-- You may use exceptions to manage failure conditions, which will simplify aspects of coding and testing, however this is
-not a marked component.
+3. Data Collection: The simulation tracks:
+     - Wins per strategy
+     - Total moves per strategy
+     - Capture rates
+     - Games played per strategy
+     - Win rates (as percentages)
+     - Average moves per win
+     - Average captures per win
 
-## Testing Requirements
-- You should use the provided test harness which applies JUnit5 via Gradle.  Your classes should go in the main subdirectory
-while the tests for those classes should be in the test subdirectory.  There is an example of a simple class demonstrating
-how one can implement the tests.  Tests must all run by calling _gradle test_.
-- You should use JUnit5 assertion methods for your tests like those demonstrated in lab.
-- All test methods should include a comment describing what you are testing and the key test cases in a short Javadoc string.
+The results are compiled and displayed after all trials are complete, showing comparative performance statistics for each strategy.
 
-## Documentation Requirements
-- You should write in a self-documenting code style which uses block commenting appropriately.
-- All code should be documented with appropriate, descriptive docstrings and block level commenting to understand what the code does.
-- You should follow all conventions of Javadoc strings including a description of the method purpose, parameters and return values.
-- You should generate a Javadoc reference for your codebase.  This is done in IntelliJ through the Tools menu. Please put the Javadoc 
-reference for your codebase in the provided _javadoc_ directory which is at the same level as your _src_ project in the directory tree. 
+## Results
+The simulation analyzed the performance of Aggressive, Defensive, and Balanced strategies over 960 games, including mixed-strategy scenarios.
+The Defensive strategy demonstrated the highest win rate (16.7%), followed by the Aggressive strategy (14.3%), while the Balanced strategy lagged significantly (6.3%).
+On average, Balanced games concluded in the fewest moves (252.0), indicating a relatively fast playstyle, though not the most successful.
+Aggressive games typically required 263.3 moves per win, reflecting their highly dynamic and confrontational nature. Defensive games were slower on average (276.3 moves per win),
+but this slower pace yielded the most consistent results.
 
-# Rubric
+Notably, Aggressive strategies had the highest average captures per win (8.5), emphasizing their focus on elimination tactics.
+In contrast, Defensive and Balanced strategies resulted in fewer captures per win, at 7.9 and 7.5 respectively,
+underscoring their more positional or nuanced playstyles.
 
-The following is the rubric of where marks will be awarded in this project.  
+In mixed-strategy scenarios, Aggressive strategies generally outperformed Balanced strategies,
+whereas Defensive strategies dominated other combinations, further validating their consistency and adaptability.
 
-## Rubric Categories
-- **Game Design (20 marks):** Average projects will produce an implementation that accurately 
-represents the board game chosen by the group using principles of cohesion to have meaningful representation of objects, reduce 
-coupling between classes to ensure future extension, and will be fully encapsulated for future compatibility and evolution. Excellent solutions 
-will have exceptional quality in the above and/or use advanced features in Java such as abstract 
-classes or interfaces appropriately. It is strongly recommended you document design choices in your class/method header Javadoc 
-documentation.
-- **Strategy Design (10 marks):** Average OOD will have all strategies implemented, provide an object structure for players 
-playing the game with a given strategy, and follow good principles of encapsulation and modularity.  Excellent solutions will
-use Java advanced features cleverly. It is strongly recommended you document design choices in your class/method header Javadoc
-documentation.
-- **Testing (10 marks):** Average TDD will have tests for the majority of classes and coverage of most branches.  Excellent
-  solutions will have very high branch coverage.
-- **Experiment (10 marks):** Average experiments will implement the simulation as specified, choose and describe 
-the data used in analysis, accurately report procedure and results and a meaningful analysis of the outcome of their experiment. 
-Excellent experiments will have robust and well justified measures, deep analysis and reflect on the lessons learned from the experiment.
-- **Code Documentation (5 marks):** Average classes will be self-documenting code with well-formed with Javadoc comments for the
-majority of methods and good block level comments.  Excellent documentation will do all of the above throughout all
-of their project.
-- **Reflection (5 marks):** Average reflections will engage with the provided prompts to have descriptions and reasoning 
-regarding their application of AI.  Excellent reflections will take into account context in which events occur, 
-questions assumption that were made at the time, describes alternatives, thinks about consequences of decisions/actions 
-on others, and engages in reflective skepticism.
+**Graphical Representation of All Metrics:**
 
-## Potential Bonus - 5% of Course Final Mark
-There are a potential bonus that may be awarded at the discretion of the marker/instructor.  Up to 5% could be
-added to your final mark to a maximum of 100% in the course.  Examples of where this may be awarded
-is as follows:
-- Complex class structure due to choosing a very complex game which is good or excellent in its design. 
-- Advanced use of Java features such as functional interfaces, abstract classes above or beyond what might
-be expected at the second year level.
-- Advanced use of algorithms in the strategies for playing the game.
-- Advanced use of Exceptions to manage different aspects of the code beyond the second year level.
-- Insightful reflections on the use of generative AI above and beyond what is expected in the criteria.
+![img_3.png](img_3.png)
 
-If you have one of the above components, or another aspect you would like considered, please provide a description and
-why you think it should be considered in the appropriate section of your report.  It is recommended that you complete the 
-requirements of the project and commit a completed project before trying to add bonus material.
+**Tabular Information of Data Presented:**
 
-# Submission
-All submission will be done through the Github Classroom.  Your team will accept the project, similar to how you have
-accepted lab assignments.  You will commit your code, and all code in the repository at the submission date will be
-marked. 
-
-As a note, it is expected that students will be regularly be committing code to the Github repository.  Late submissions
-due to technical issues will not normally be accepted. 
-
-# Team Dynamics
-For those working in a pair, it is expected that each individual will contribute in meaningful and substantive ways to
-the project.  If a complaint is raised by one or both of the members of a working pair, or during final marking, the 
-instructor will examine  the Github logs as evidence regarding contribution. This does not mean that each team member must have the same number of commits, but both members should be pushing code to the repository.  At the discretion of the instructor, under performing members will have deductions associated with their contribution, up to and including 0 for the project for a complete absence of 
-meaningful and substantive contributions.  
-
-If there are serious problems arise in multiple groups, the instructor may introduce a short survey halfway through 
-the project period regarding relative contributions.  If this occurs, it will be announced through Moodle.
-
-# Academic Misconduct
-
-## Academic Integrity Statement
-
-In your project package for this project you will include a text file in the project folder, at the same
-folder level as _src_ named **INTEGRITY.md**. 
-
-**Please read this file carefully and update it to have your names and student numbers.  Students who
-do not complete this statement will have a deduction of 10% from the project mark**.
-
-## Academic Integrity and Generative AI
-It is clear from this project description that you are permitted to use generative AI as part of your toolset.  However,
-this does not mean that the rest of UPEI Academic Regulation 20 is not applicable to this assignment.  It is expected that
-you will abide by the rules regarding plagiarism, misrepresentation, solicitation and fabrication of results, as well as any
-other forms of academic misconduct.
-
-As a caution, groups working on the same game (which will likely happen) will naturally have variation in how they are implemented.
-It is highly improbable that two groups would have near identical implementations with the number of choices in this project. Further,
-it is highly improbable that two groups would have near identical implementations just because they used the same generative AI
-tools.  Such a claim would not be accepted in an academic misconduct investigation.  A reminder that as per the syllabus, a team 
-that has academic misconduct upheld will lose receive 0, losing 15% of the final mark, and an additional 15% from their final mark.
-Individuals with previous academic misconduct allegations upheld will further have a maximum mark of 50% possible in
-the course.
+| Metric                | Aggressive Strategy | Defensive Strategy | Balanced Strategy |
+|-----------------------|---------------------|--------------------|-------------------|
+| Games Played          | 280                 | 360                | 320               |
+| Wins                  | 40                  | 60                 | 20                |
+| Win Rate (%)          | 14.3                | 16.7               | 6.3               |
+| Avg. Moves per Win    | 263.3               | 276.3              | 252.0             |
+| Avg. Captures per Win | 8.5                 | 7.9                | 7.5               |
 
 
+## Analysis of Strategy Performance
+**1. Defensive Strategy**
+
+Wins: 60 (16.7%) – highest among all strategies.
+Average Moves per Win: 276.3 (longest).
+Average Captures per Win: 7.9.
+
+**Strengths:**
+Defensive strategy has the highest win rate, reflecting superior consistency and effectiveness. It excels at outlasting opponents by prioritizing position and endurance, resulting in victories against diverse opponents. In mixed-strategy tests, it dominated both Aggressive and Balanced approaches, reinforcing its adaptability.
+
+**Weaknesses:**
+Defensive games take longer (276.3 moves on average), which may be less efficient in time-constrained scenarios. Additionally, with 7.9 captures per win, its reliance on gradual control sacrifices some offensive potential.
+
+**2. Aggressive Strategy**
+
+Wins: 40 (14.3%).
+Average Moves per Win: 263.3.
+Average Captures per Win: 8.5 – highest among all strategies.  
+
+**Strengths:**
+The Aggressive strategy has the highest captures per win (8.5), showcasing its ability to overwhelm opponents through eliminations. Its relatively faster pace (263.3 moves) suits players favoring direct, decisive gameplay. It performed well in mixed tests, frequently overpowering Balanced approaches.
+
+**Weaknesses:**
+With a lower win rate (14.3%), the Aggressive strategy lacks the consistency seen in Defensive approaches. Its confrontational style may lead to vulnerabilities in prolonged games or against more adaptable strategies.
+
+**3. Balanced Strategy**
+
+Wins: 20 (6.3%) – lowest among all strategies.
+Average Moves per Win: 252.0 – shortest.
+Average Captures per Win: 7.5 – lowest.
+
+**Strengths:**
+Balanced games concluded the fastest (252.0 moves), making it the most time-efficient strategy. This approach excels in mixed scenarios by leveraging both offensive and defensive elements but lacks a clear focus, making it versatile yet unspecialized.
+
+**Weaknesses:**
+The Balanced strategy’s low win rate (6.3%) reflects a lack of dominance in any particular area. Its low captures (7.5 per win) further indicate limited effectiveness in exerting direct pressure.
+
+**Overall Conclusion:**
+
+Defensive is the most consistent strategy, with the highest win rate and adaptability, making it ideal for longer, methodical games. Aggressive excels in fast-paced, elimination-focused play but sacrifices reliability. Balanced offers efficiency but struggles to outperform specialized strategies. Defensive’s robust performance across diverse scenarios makes it the most effective overall, while Aggressive suits players seeking high-stakes, action-oriented matches.
+
+# Reflection
+
+### What generative AI did we use, and what tasks did we use it for?
+_**ChatGPT:** Assisted in debugging and understanding GUI code_<br>
+_**v0 by Vercel:** Generated base code for each class_<br>
+_**Cursor AI:** Helped re-write classes with necessary patches_
 
 
+### How did you learn about the tools used by your group (delete ones that don't apply)?
+_**ChatGPT:** Common word of mouth and popular usage_<br>
+_**v0 by Vercel:** Research through web forums and YouTube_<br>
+_**Cursor AI:** Pizza Seminar Lecture with Dr. Tamayo-Vera in November 2024_
+
+### Reflecting on your experience:
+**What Went Well**
+
+One of the standout successes was using generative AI to implement the GUI (v0 and Cursor) and create a human-interactive game alongside the simulation experiment. ChatGPT, in particular, excelled at breaking down complex problems, teaching new concepts, and improving our understanding of coding structures. It helped us grasp unfamiliar ideas quickly, significantly enhancing our learning process.
+
+Cursor AI provided efficient ideas and strategies for implementation, especially for designing the simulation’s strategy point system. v0 shone in writing precise code for specific strategies, which contributed to the depth and effectiveness of our simulations. Additionally, generative AI cut down our coding time, allowing us to focus more on refining and experimenting with strategies.
+
+**What Didn’t Go Well**
+
+Generative AI had its shortcomings, particularly in debugging. For instance, using v0 to implement patches often led to subsequent errors in related classes. While it quickly generated fixes, those fixes sometimes disrupted other parts of the program, necessitating manual review and debugging. This added extra steps to ensure the overall stability of the project.
+
+**Limitations Encountered**
+
+Generative AI’s code lacked modularity and reusability, which became evident as the project grew in complexity. Fixing multiple errors simultaneously and tracking corrections was challenging, as AI-generated solutions were often too narrowly focused and didn’t account for the bigger picture.
+
+**Impact on Our Solution**
+
+Generative AI helped us evolve the project in several ways. The addition of a GUI and the implementation of better strategies were direct results of insights from these tools. Cursor AI improved the quality of strategies implemented, while ChatGPT provided valuable feedback that led to more refined, modular, and efficient code in v0. Together, these tools enhanced the project's overall functionality and depth.
+
+**What Could Be Improved**
+
+To improve the project, we could have dedicated more time to understanding the tools and principles we relied on, such as Java Swing (for GUI) and TDD (Test-Driven Development). With better preparation, we could have reduced our dependency on generative AI for creating tests. Additionally, exploring other generative AI tools or understanding the ones we used in greater detail might have further enhanced the project.
+
+**Conclusion**
+
+Generative AI was an invaluable asset for this project, streamlining workflows and accelerating development. However, its limitations in debugging, modularity, and handling large-scale programming emphasized the need for human oversight and a strong foundational understanding of core programming concepts. Balancing AI assistance with manual expertise would lead to even better outcomes in future projects.
